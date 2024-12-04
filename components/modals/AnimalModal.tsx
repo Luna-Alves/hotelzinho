@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { IAnimal } from "@/interfaces/IAnimal";
+import React, { useEffect, useState } from "react";
 import { Modal, TouchableOpacity, StyleSheet, View, Text } from "react-native";
 import { TextInput } from "react-native";
 
@@ -9,16 +10,22 @@ export type AnimalModalProps = {
     age: number,
     type: string,
     breed: string,
-    color: string
+    color: string,
+    id?: number
   ) => void;
   onCancel: () => void;
+  onDelete: (id: number) => void;
+  animal?: IAnimal;
 };
 
 export default function AnimalModal({
   visible,
   onAdd,
   onCancel,
+  onDelete,
+  animal,
 }: AnimalModalProps) {
+  const [id, setId] = useState<number | undefined>(undefined);
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
   const [type, setType] = useState("");
@@ -27,9 +34,28 @@ export default function AnimalModal({
 
   const handleAdd = () => {
     if (name && age && type && breed && color) {
-      onAdd(name, parseInt(age, 10), type, breed, color);
+      onAdd(name, parseInt(age, 10), type, breed, color, id);
+      onCancel();
     }
   };
+
+  useEffect(() => {
+    if (animal) {
+      setId(animal.id);
+      setName(animal.name);
+      setAge(animal.age.toString());
+      setType(animal.type);
+      setBreed(animal.breed);
+      setColor(animal.color);
+    } else {
+      setId(undefined);
+      setName("");
+      setAge("");
+      setType("");
+      setBreed("");
+      setColor("");
+    }
+  }, [animal]);
 
   return (
     <Modal
@@ -75,7 +101,9 @@ export default function AnimalModal({
 
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.buttonAdd} onPress={handleAdd}>
-              <Text style={styles.buttonText}>Adicionar</Text>
+              <Text style={styles.buttonText}>
+                {id !== undefined ? "Atualizar" : "Adicionar"}
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.buttonCancel}
@@ -83,6 +111,14 @@ export default function AnimalModal({
             >
               <Text style={styles.buttonText}>Cancelar</Text>
             </TouchableOpacity>
+            {id !== undefined && (
+              <TouchableOpacity
+                style={styles.buttonDelete}
+                onPress={() => onDelete(id!)}
+              >
+                <Text style={styles.buttonText}>Deletar</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </View>
@@ -103,6 +139,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     margin: 20,
+    padding: 20,
   },
   buttonText: {
     fontWeight: "bold",
@@ -118,6 +155,15 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   buttonCancel: {
+    backgroundColor: "orange",
+    borderRadius: 5,
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    margin: 10,
+    padding: 20,
+  },
+  buttonDelete: {
     backgroundColor: "red",
     borderRadius: 5,
     flex: 1,
@@ -137,5 +183,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: "#DDD",
     margin: 5,
+    paddingHorizontal: 10,
   },
 });

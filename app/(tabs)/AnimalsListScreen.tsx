@@ -1,4 +1,3 @@
-import Animal from "@/components/animal/Animal";
 import AnimalModal from "@/components/modals/AnimalModal";
 import MyScrollView from "@/components/MyScrollView";
 import { ThemedView } from "@/components/ThemedView";
@@ -10,28 +9,50 @@ import AnimalCard from "@/components/cards/AnimalCard";
 export default function AnimalsListScreen() {
   const [animals, setAnimals] = useState<IAnimal[]>([]);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [selectedAnimal, setSelectedAnimal] = useState<IAnimal>();
 
   const onAdd = (
     name: string,
     age: number,
     type: string,
     breed: string,
-    color: string
+    color: string,
+    id?: number
   ) => {
-    const newAnimal: IAnimal = {
-      id: Math.random() * 1000,
-      name,
-      age,
-      type,
-      breed,
-      color,
-    };
+    if (id === undefined) {
+      const newAnimal: IAnimal = {
+        id: Math.floor(Math.random() * 1000),
+        name: name,
+        age: age,
+        type: type,
+        breed: breed,
+        color: color,
+      };
 
-    setAnimals([...animals, newAnimal]);
+      setAnimals([...animals, newAnimal]);
+    } else {
+      const updatedAnimals = animals.map((animal) =>
+        animal.id === id ? { ...animal, name, age, type, breed, color } : animal
+      );
+      setAnimals(updatedAnimals);
+    }
+
+    setModalVisible(false);
+  };
+
+  const onDelete = (id: number) => {
+    const newAnimals = animals.filter((animal) => animal.id !== id);
+    setAnimals(newAnimals);
     setModalVisible(false);
   };
 
   const openModal = () => {
+    setSelectedAnimal(undefined);
+    setModalVisible(true);
+  };
+
+  const openEditModal = (animal: IAnimal) => {
+    setSelectedAnimal(animal);
     setModalVisible(true);
   };
 
@@ -48,18 +69,28 @@ export default function AnimalsListScreen() {
       </ThemedView>
       <ThemedView style={styles.container}>
         {animals.map((animal) => (
-          <AnimalCard
+          <TouchableOpacity
             key={animal.id}
-            name={animal.name}
-            age={animal.age}
-            breed={animal.breed}
-            type={animal.type}
-            color={animal.color}
-          />
+            onPress={() => openEditModal(animal)}
+          >
+            <AnimalCard
+              name={animal.name}
+              age={animal.age}
+              breed={animal.breed}
+              type={animal.type}
+              color={animal.color}
+            />
+          </TouchableOpacity>
         ))}
       </ThemedView>
 
-      <AnimalModal visible={modalVisible} onCancel={closeModal} onAdd={onAdd} />
+      <AnimalModal
+        visible={modalVisible}
+        onCancel={closeModal}
+        onAdd={onAdd}
+        onDelete={onDelete}
+        animal={selectedAnimal}
+      />
     </MyScrollView>
   );
 }
