@@ -1,104 +1,82 @@
-import { IAnimal } from "@/interfaces/IAnimal";
+import { IService } from "@/interfaces/IService";
 import React, { useEffect, useState } from "react";
-import { Modal, TouchableOpacity, StyleSheet, View, Text } from "react-native";
-import { TextInput } from "react-native";
+import {
+  Modal,
+  TouchableOpacity,
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+} from "react-native";
 
-export type AnimalModalProps = {
+export type ServiceModalProps = {
   visible: boolean;
-  onAdd: (
-    name: string,
-    age: number,
-    type: string,
-    breed: string,
-    color: string,
-    id?: number
-  ) => void;
+  onAdd: (name: string, description: string, date: string, id?: number) => void;
   onCancel: () => void;
   onDelete: (id: number) => void;
-  animal?: IAnimal;
+  service?: IService;
 };
 
-export default function AnimalModal({
+export default function ServiceModal({
   visible,
   onAdd,
   onCancel,
   onDelete,
-  animal,
-}: AnimalModalProps) {
+  service,
+}: ServiceModalProps) {
   const [id, setId] = useState<number | undefined>(undefined);
   const [name, setName] = useState("");
-  const [age, setAge] = useState("");
-  const [type, setType] = useState("");
-  const [breed, setBreed] = useState("");
-  const [color, setColor] = useState("");
-
-  const handleAdd = () => {
-    if (name && age && type && breed && color) {
-      onAdd(name, parseInt(age, 10), type, breed, color, id);
-      onCancel();
-    }
-  };
+  const [description, setDescription] = useState("");
+  const [date, setDate] = useState("");
 
   useEffect(() => {
-    if (animal) {
-      setId(animal.id);
-      setName(animal.name);
-      setAge(animal.age.toString());
-      setType(animal.type);
-      setBreed(animal.breed);
-      setColor(animal.color);
+    if (service) {
+      setId(service.id);
+      setName(service.name);
+      setDescription(service.description);
+      setDate(service.date);
     } else {
       setId(undefined);
       setName("");
-      setAge("");
-      setType("");
-      setBreed("");
-      setColor("");
+      setDescription("");
+      setDate("");
     }
-  }, [animal]);
+  }, [service]);
+
+  const handleAdd = () => {
+    if (name && description && date) {
+      onAdd(name, description, date, id);
+    }
+  };
 
   return (
     <Modal
       visible={visible}
-      animationType="fade"
       transparent={true}
+      animationType="fade"
       onRequestClose={() => {}}
     >
       <View style={styles.container}>
         <View style={styles.boxContainer}>
           <TextInput
             style={styles.boxInput}
-            placeholder="Nome do Animal"
+            placeholder="Nome do Serviço"
             value={name}
             onChangeText={(text) => setName(text)}
             autoFocus
           />
           <TextInput
             style={styles.boxInput}
-            placeholder="Tipo"
-            value={type}
-            onChangeText={(text) => setType(text)}
+            placeholder="Descrição"
+            value={description}
+            onChangeText={(text) => setDescription(text)}
           />
           <TextInput
             style={styles.boxInput}
-            placeholder="Idade"
-            value={age}
-            onChangeText={setAge}
-            keyboardType="numeric"
+            placeholder="Data (YYYY-MM-DD)"
+            value={date}
+            onChangeText={(text) => setDate(text)}
           />
-          <TextInput
-            style={styles.boxInput}
-            placeholder="Raça"
-            value={breed}
-            onChangeText={setBreed}
-          />
-          <TextInput
-            style={styles.boxInput}
-            placeholder="Cor"
-            value={color}
-            onChangeText={setColor}
-          />
-
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.buttonAdd} onPress={handleAdd}>
               <Text style={styles.buttonText}>
@@ -114,7 +92,7 @@ export default function AnimalModal({
             {id !== undefined && (
               <TouchableOpacity
                 style={styles.buttonDelete}
-                onPress={() => onDelete(id!)}
+                onPress={() => onDelete(id)}
               >
                 <Text style={styles.buttonText}>Deletar</Text>
               </TouchableOpacity>

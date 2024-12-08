@@ -57,6 +57,15 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="ServicesListScreen"
+        options={{
+          title: "Cadastro de Serviços",
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? "bug" : "bug-outline"} color={color} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }
