@@ -2,14 +2,19 @@ import AnimalModal from "@/components/modals/AnimalModal";
 import MyScrollView from "@/components/MyScrollView";
 import { ThemedView } from "@/components/ThemedView";
 import { IAnimal } from "@/interfaces/IAnimal";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import AnimalCard from "@/components/cards/AnimalCard";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Location from "expo-location";
 
 export default function AnimalsListScreen() {
   const [animals, setAnimals] = useState<IAnimal[]>([]);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [selectedAnimal, setSelectedAnimal] = useState<IAnimal>();
+
+  const [location, setLocation] = useState<any>(null);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const onAdd = (
     name: string,
@@ -22,27 +27,29 @@ export default function AnimalsListScreen() {
     if (id === undefined) {
       const newAnimal: IAnimal = {
         id: Math.floor(Math.random() * 1000),
-        name: name,
-        age: age,
-        type: type,
-        breed: breed,
-        color: color,
+        name,
+        age,
+        type,
+        breed,
+        color,
       };
-
-      setAnimals([...animals, newAnimal]);
+      setAnimals((prevAnimals) => [...prevAnimals, newAnimal]);
     } else {
-      const updatedAnimals = animals.map((animal) =>
-        animal.id === id ? { ...animal, name, age, type, breed, color } : animal
+      setAnimals((prevAnimals) =>
+        prevAnimals.map((animal) =>
+          animal.id === id
+            ? { ...animal, name, age, type, breed, color }
+            : animal
+        )
       );
-      setAnimals(updatedAnimals);
     }
-
     setModalVisible(false);
   };
 
   const onDelete = (id: number) => {
-    const newAnimals = animals.filter((animal) => animal.id !== id);
-    setAnimals(newAnimals);
+    setAnimals((prevAnimals) =>
+      prevAnimals.filter((animal) => animal.id !== id)
+    );
     setModalVisible(false);
   };
 
@@ -60,12 +67,62 @@ export default function AnimalsListScreen() {
     setModalVisible(false);
   };
 
+  useEffect(() => {
+    async function getData() {
+      try {
+        const data = await AsyncStorage.getItem("@AnimalsApp:animals");
+        const animalsData = data != null ? JSON.parse(data) : [];
+        setAnimals(animalsData);
+      } catch (e) {
+        console.error("Erro ao carregar os dados do AsyncStorage", e);
+      }
+    }
+
+    getData();
+  }, []);
+
+  useEffect(() => {
+    async function saveData() {
+      try {
+        await AsyncStorage.setItem(
+          "@AnimalsApp:animals",
+          JSON.stringify(animals)
+        );
+      } catch (e) {
+        console.error("Erro ao salvar os dados no AsyncStorage", e);
+      }
+    }
+
+    saveData();
+  }, [animals]);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied :(");
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+    })();
+  }, []);
+
+  let text = "Buscando localização...";
+  if (errorMsg) {
+    text = errorMsg;
+  } else if (location) {
+    text = `Latitude: ${location.coords.latitude}, Longitude: ${location.coords.longitude}`;
+  }
+
   return (
     <MyScrollView headerBackgroundColor={{ light: "#a5ab7f", dark: "#6f773a" }}>
       <ThemedView style={styles.headerContainer}>
         <TouchableOpacity onPress={openModal}>
           <Text style={styles.headerButton}>Adicionar Animal</Text>
         </TouchableOpacity>
+        <Text style={styles.text}>{text}</Text>
       </ThemedView>
       <ThemedView style={styles.container}>
         {animals.map((animal) => (
@@ -109,5 +166,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 20,
     paddingHorizontal: 20,
+  },
+  text: {
+    fontSize: 14,
+    marginTop: 10,
+    color: "#333",
   },
 });

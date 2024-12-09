@@ -73,7 +73,7 @@ export default function ServiceModal({
           />
           <TextInput
             style={styles.boxInput}
-            placeholder="Data (YYYY-MM-DD)"
+            placeholder="Data (DD-MM-YYYY)"
             value={date}
             onChangeText={(text) => setDate(text)}
           />
