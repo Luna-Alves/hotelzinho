@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import ServiceCard from "@/components/cards/ServiceCard";
 import ServiceModal from "@/components/modals/ServiceModal";
 import { IService } from "@/interfaces/IService";
@@ -7,8 +7,10 @@ import { ThemedView } from "@/components/ThemedView";
 import MyScrollView from "@/components/MyScrollView";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
+import { useRouter } from "expo-router";
 
 export default function ServicesListScreen() {
+  const router = useRouter();
   const [services, setServices] = useState<IService[]>([]);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [selectedService, setSelectedService] = useState<IService | null>(null);
@@ -117,6 +119,15 @@ export default function ServicesListScreen() {
           <Text style={styles.headerButton}>Adicionar Serviço</Text>
         </TouchableOpacity>
         <Text style={styles.text}>{text}</Text>
+        <View style={styles.container}>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              onPress={() => router.replace("/(tabs)/hotelzinho")}
+            >
+              <Text style={styles.backButton}>⬅ Voltar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </ThemedView>
       <ThemedView style={styles.container}>
         {services.map((service) => (
@@ -146,8 +157,18 @@ export default function ServicesListScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#6f773a",
+    backgroundColor: "#a5ab7f",
+  },
+  buttonContainer: {
+    alignItems: "flex-start",
+  },
+  backButton: {
+    fontWeight: "bold",
+    fontSize: 18,
+    color: "#fff",
+    backgroundColor: "#a5ab7f",
+    padding: 10,
+    borderRadius: 8,
   },
   headerContainer: {
     backgroundColor: "white",

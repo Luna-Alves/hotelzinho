@@ -1,4 +1,13 @@
-import { Platform, Dimensions, Image, StyleSheet, Text } from "react-native";
+import {
+  Platform,
+  Dimensions,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { useRouter } from "expo-router";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
@@ -6,6 +15,8 @@ import { ThemedView } from "@/components/ThemedView";
 const { width, height } = Dimensions.get("window");
 
 export default function Hotelzinho() {
+  const router = useRouter();
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: "#a5ab7f", dark: "#6f773a" }}
@@ -16,6 +27,20 @@ export default function Hotelzinho() {
         />
       }
     >
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          onPress={() => router.push("/(tabs)/AnimalsListScreen")}
+        >
+          <Text style={styles.screenButton}>🐾 Ver Animais</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => router.push("/(tabs)/ServicesListScreen")}
+        >
+          <Text style={styles.screenButton}>Ver Serviços</Text>
+        </TouchableOpacity>
+      </View>
+
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">
           Boas-vindas ao Hotelzinho Bichológico!
@@ -50,6 +75,13 @@ const styles = StyleSheet.create({
     left: 20,
     position: "absolute",
   },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
+    gap: 10,
+    marginTop: 5,
+  },
   contentContainer: {
     flexDirection: "row",
     paddingTop: 16,
@@ -63,5 +95,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     fontSize: Platform.OS === "web" ? 24 : width * 0.05,
     lineHeight: 30,
+  },
+  screenButton: {
+    fontWeight: "bold",
+    fontSize: 18,
+    color: "#fff",
+    backgroundColor: "#a5ab7f",
+    padding: 10,
+    borderRadius: 8,
+    textAlign: "center",
+    width: 200,
   },
 });

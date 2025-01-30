@@ -3,12 +3,14 @@ import MyScrollView from "@/components/MyScrollView";
 import { ThemedView } from "@/components/ThemedView";
 import { IAnimal } from "@/interfaces/IAnimal";
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import AnimalCard from "@/components/cards/AnimalCard";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
+import { useRouter } from "expo-router";
 
 export default function AnimalsListScreen() {
+  const router = useRouter();
   const [animals, setAnimals] = useState<IAnimal[]>([]);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [selectedAnimal, setSelectedAnimal] = useState<IAnimal>();
@@ -123,6 +125,15 @@ export default function AnimalsListScreen() {
           <Text style={styles.headerButton}>Adicionar Animal</Text>
         </TouchableOpacity>
         <Text style={styles.text}>{text}</Text>
+        <View style={styles.container}>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              onPress={() => router.replace("/(tabs)/hotelzinho")}
+            >
+              <Text style={styles.backButton}>⬅ Voltar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </ThemedView>
       <ThemedView style={styles.container}>
         {animals.map((animal) => (
@@ -154,8 +165,18 @@ export default function AnimalsListScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#6f773a",
+    backgroundColor: "#a5ab7f",
+  },
+  buttonContainer: {
+    alignItems: "flex-start",
+  },
+  backButton: {
+    fontWeight: "bold",
+    fontSize: 18,
+    color: "#fff",
+    backgroundColor: "#a5ab7f",
+    padding: 10,
+    borderRadius: 8,
   },
   headerContainer: {
     backgroundColor: "white",
